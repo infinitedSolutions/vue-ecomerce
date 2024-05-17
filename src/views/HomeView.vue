@@ -13,8 +13,6 @@ export default {
 
 <template>
   <v-app>
-    <main>
-      <HomeMain />
-    </main>
+    <HomeMain />
   </v-app>
 </template>

@@ -2,20 +2,20 @@
 import { computed } from 'vue'
 import { useCartStore } from '../stores/Cart'
 import ListProductos from './home/ListProductos.vue'
+import ListCategorias from './home/ListCategorias.vue'
 import Navbar from './shared/NavBar.vue'
 
 export default {
   name: 'HomeMain',
   components: {
     Navbar,
-    ListProductos
+    ListProductos,
+    ListCategorias
   },
   setup() {
     const productos = computed(() => useCartStore().getProductos)
-    const cart = computed(() => useCartStore().getCart)
-    const productosInCart = computed(() => cart.value.productos)
 
-    return { productos, cart, productosInCart }
+    return { productos }
   },
   created() {
     if (useCartStore().getProductos.length === 0) useCartStore().generarProductosEjemplo()
@@ -23,14 +23,17 @@ export default {
 }
 </script>
 <template>
-  <v-container>
-    <Navbar />
-    <ListProductos :productos="productos" />
-
-    <v-list lines="one">
-      <v-list-item v-for="item in productosInCart" :key="item.id"
-        >{{ item.producto.nombre }}-{{ item.quantity }}</v-list-item
-      >
-    </v-list>
-  </v-container>
+  <Navbar />
+  <v-main>
+    <v-container>
+      <v-row>
+        <v-col cols="2">
+          <ListCategorias />
+        </v-col>
+        <v-col cols="10">
+          <ListProductos :productos="productos" />
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-main>
 </template>

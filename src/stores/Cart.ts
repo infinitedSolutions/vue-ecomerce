@@ -2,13 +2,11 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { Cart, CartProducto, Producto } from '@/types'
-import ConsApiClass from '@/models/consApi';
-import Swal from 'sweetalert2';
-import apiPeticion from '@/utils/api';
+import ConsApiClass from '@/models/consApi'
+import Swal from 'sweetalert2'
+import apiPeticion from '@/utils/api'
 
-
-
-export const useCartStore = defineStore("cart", {
+export const useCartStore = defineStore('cart', {
   state: () => ({
     cart: ref(<Cart>{} || null),
     productos: ref(<Array<Producto>>[] || null)
@@ -19,39 +17,45 @@ export const useCartStore = defineStore("cart", {
     },
     getProductos(): any {
       return this.productos
+    },
+    getCartQuantity: (state) => {
+      return state.cart.quantity
+    },
+    getCartProducts: (state) => {
+      return state.cart.productos
     }
   },
   actions: {
     async getProductoFeacture(lenguage: string) {
-      const consApiClass = new ConsApiClass();
-      const result = (await apiPeticion(
-        consApiClass.urls.productos,
-        lenguage
-      )) as Array<Producto>;
-      this.productos = result;
+      const consApiClass = new ConsApiClass()
+      const result = (await apiPeticion(consApiClass.urls.productos, lenguage)) as Array<Producto>
+      this.productos = result
     },
     AddCart(producto: Producto) {
       if (this.cart) {
         if (!this.cart.productos) {
-          this.cart = { productos: [], quantity: 0, total: 0 };
+          this.cart = { productos: [], quantity: 0, total: 0 }
         }
       }
       //buscar si el producto ya esta en el carrito
-      let index = this.cart.productos.findIndex((element: CartProducto) => element.producto?.id == producto.id)
+      let index = this.cart.productos.findIndex(
+        (element: CartProducto) => element.producto?.id == producto.id
+      )
 
       if (index >= 0) {
-        console.log('entro 1')
         this.cart.productos[index].quantity += 1
-        this.cart.productos[index].total = this.cart.productos[index].quantity * this.cart.productos[index].producto.precio
+        this.cart.productos[index].total =
+          this.cart.productos[index].quantity * this.cart.productos[index].producto.precio
         this.cart.quantity = this.cart.productos.reduce((acc, element) => acc + element.quantity, 0)
         this.cart.total = this.cart.productos.reduce((acc, element) => acc + element.total, 0)
       } else {
-        console.log('entro')
         this.cart.productos.push({ producto: producto, quantity: 1, total: producto.precio })
         this.cart.quantity = this.cart.productos.reduce((acc, element) => acc + element.quantity, 0)
         this.cart.total = this.cart.productos.reduce((acc, element) => acc + element.total, 0)
       }
-      const indexProducto = this.productos.findIndex((element: Producto) => element.id == producto.id)
+      const indexProducto = this.productos.findIndex(
+        (element: Producto) => element.id == producto.id
+      )
       this.productos[indexProducto].cantidad_disponible -= 1
       Swal.fire({
         title: 'Producto Agregado',
@@ -59,20 +63,22 @@ export const useCartStore = defineStore("cart", {
         icon: 'success',
         confirmButtonText: 'Ok'
       })
-      console.log(this.cart)
     },
     removeToCart(producto: Producto) {
       // Accede al valor real del ref 'cart'
       if (!this.cart || !this.cart.productos) {
-        this.cart = { productos: [], quantity: 0, total: 0 };
+        this.cart = { productos: [], quantity: 0, total: 0 }
       }
 
       //buscar si el producto ya esta en el carrito
-      let index = this.cart.productos.findIndex((element: CartProducto) => element.producto?.id == producto.id)
+      let index = this.cart.productos.findIndex(
+        (element: CartProducto) => element.producto?.id == producto.id
+      )
       //si el producto esta en el carrito y la cantidad es mayor a 1
       if (index >= 0 && this.cart.productos[index].quantity > 1) {
         this.cart.productos[index].quantity -= 1
-        this.cart.productos[index].total = this.cart.productos[index].quantity * this.cart.productos[index].producto.precio
+        this.cart.productos[index].total =
+          this.cart.productos[index].quantity * this.cart.productos[index].producto.precio
         this.cart.quantity = this.cart.productos.reduce((acc, element) => acc + element.quantity, 0)
         this.cart.total = this.cart.productos.reduce((acc, element) => acc + element.total, 0)
       } else {
@@ -89,8 +95,12 @@ export const useCartStore = defineStore("cart", {
       })
     },
     RemoveToCartAll(producto: Producto) {
-      const indexProducto = this.productos.findIndex((element: Producto) => element.id == producto.id)
-      const index = this.cart.productos.findIndex((element: CartProducto) => element.producto?.id == producto.id)
+      const indexProducto = this.productos.findIndex(
+        (element: Producto) => element.id == producto.id
+      )
+      const index = this.cart.productos.findIndex(
+        (element: CartProducto) => element.producto?.id == producto.id
+      )
       this.productos[indexProducto].cantidad_disponible += this.cart.productos[index].quantity
 
       if (index >= 0) {
@@ -98,16 +108,21 @@ export const useCartStore = defineStore("cart", {
         this.cart.quantity = this.cart.productos.reduce((acc, element) => acc + element.quantity, 0)
         this.cart.total = this.cart.productos.reduce((acc, element) => acc + element.total, 0)
       }
-
     },
     updateCart(producto: Producto, cantidad: number) {
-      const index = this.cart.productos.findIndex((element: CartProducto) => element.producto?.id == producto.id)
+      const index = this.cart.productos.findIndex(
+        (element: CartProducto) => element.producto?.id == producto.id
+      )
       if (index >= 0) {
         if (cantidad <= this.cart.productos[index].producto.cantidad_disponible) {
           const dif = cantidad - this.cart.productos[index].quantity
           this.cart.productos[index].quantity = cantidad
-          this.cart.productos[index].total = this.cart.productos[index].quantity * this.cart.productos[index].producto.precio
-          this.cart.quantity = this.cart.productos.reduce((acc, element) => acc + element.quantity, 0)
+          this.cart.productos[index].total =
+            this.cart.productos[index].quantity * this.cart.productos[index].producto.precio
+          this.cart.quantity = this.cart.productos.reduce(
+            (acc, element) => acc + element.quantity,
+            0
+          )
           this.cart.total = this.cart.productos.reduce((acc, element) => acc + element.total, 0)
           //Buscar el producto en la lista de productos
           const indexp = this.productos.findIndex((element: Producto) => element.id == producto.id)
@@ -120,7 +135,6 @@ export const useCartStore = defineStore("cart", {
       }
     },
     generarProductosEjemplo() {
-
       for (let i = 1; i <= 12; i++) {
         this.productos.push({
           id: i,
@@ -130,27 +144,28 @@ export const useCartStore = defineStore("cart", {
           vendidos: 0,
           descripcion: `Descripcion del producto ${i}`,
           precio: i * 1000,
-          url: 'https://via.placeholder.com/150'
-        });
+          url: 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'
+        })
       }
     },
     inCart(producto: Producto) {
       if (this.cart) {
         if (!this.cart.productos) {
-          this.cart = { productos: [], quantity: 0, total: 0 };
+          this.cart = { productos: [], quantity: 0, total: 0 }
         }
       }
       //buscar si el producto ya esta en el carrito
-      let index = this.cart.productos.findIndex((element: CartProducto) => element.producto?.id == producto.id)
+      let index = this.cart.productos.findIndex(
+        (element: CartProducto) => element.producto?.id == producto.id
+      )
       if (index >= 0) {
         return true
       } else {
         return false
       }
     }
-
   },
   persist: {
-    storage: sessionStorage,
+    storage: sessionStorage
   }
-});
+})

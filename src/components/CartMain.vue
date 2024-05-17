@@ -1,10 +1,12 @@
 <script lang="ts">
 import Navbar from './shared/NavBar.vue'
+import ShopingCart from './cart/ShopingCart.vue'
 
 export default {
   name: 'CartMain',
   components: {
-    Navbar
+    Navbar,
+    ShopingCart
   },
   setup() {
     return {}
@@ -12,7 +14,10 @@ export default {
 }
 </script>
 <template>
-  <v-container>
-    <Navbar />
-  </v-container>
+  <Navbar />
+  <v-main>
+    <v-container>
+      <ShopingCart />
+    </v-container>
+  </v-main>
 </template>

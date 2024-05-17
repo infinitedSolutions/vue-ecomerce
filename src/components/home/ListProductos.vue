@@ -23,7 +23,7 @@ export default {
 
 <template>
   <v-row>
-    <v-col cols="3" v-for="producto in productos" :key="producto.id">
+    <v-col cols="4" v-for="producto in productos" :key="producto.id">
       <ItemProduct :producto="producto" />
     </v-col>
   </v-row>
